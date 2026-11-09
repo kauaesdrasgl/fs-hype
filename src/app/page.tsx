@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { ArrowDownRight, ArrowRight, Check, ShoppingBag, X } from "lucide-react";
 import { demoProducts, formatBRL, type Product } from "@/lib/products";
 
@@ -82,9 +83,9 @@ export default function HomePage() {
 
       <header className="site-header">
         <div className="container header-inner">
-          <a className="brand" href="/" aria-label="FS HYPE — Página inicial">
-            <img src="/images/fs-hype-logo.png" alt="FS HYPE" className="brand-logo"/>
-          </a>
+          <Link className="brand" href="/" aria-label="FS HYPE — Página inicial">
+            <img src="/images/fs-hype-logo.png" alt="FS HYPE" className="brand-logo" />
+          </Link>
           <nav className="nav-links" aria-label="Navegação principal">
             <a href="#novidades">Novidades</a>
             <a href="#categorias">Categorias</a>

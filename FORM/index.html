@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0910">
+  <meta name="description" content="Formulário de cadastro de produtos para o catálogo da FS HYPE.">
+  <title>Cadastro de Produtos | FS HYPE</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="topline">FS HYPE <span>—</span> GESTÃO DE CATÁLOGO</div>
+  <header class="header wrap">
+    <a class="logo" href="#inicio" aria-label="FS HYPE, início">FS<span>.</span>HYPE</a>
+    <span class="header-tag"><span class="dot"></span> PORTAL DE CADASTRO</span>
+  </header>
+  <main class="wrap" id="inicio">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">CATÁLOGO / COLETA DE INFORMAÇÕES</div>
+      <h1 id="page-title">Cadastro de <em>produtos.</em></h1>
+      <p>Preencha os dados de cada item do estoque para estruturarmos o catálogo digital da FS HYPE. As informações serão utilizadas na criação da loja virtual.</p>
+      <div class="instructions"><span class="number">01</span><span>Preencha <strong>um produto por envio</strong>. Informe preços e estoque reais. Após enviar, você poderá cadastrar o próximo item.</span></div>
+    </section>
+    <div class="layout">
+      <form id="productForm" class="form-card" action="https://api.sheetmonkey.io/form/4XZMXEvzfhcRzmXLcxZcK7" method="post">
+        <input type="hidden" name="Created" value="x-sheetmonkey-current-date-time">
+        <input type="hidden" name="Origem" value="Portal de cadastro FS HYPE">
+        <section class="section">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Identificação</h2><p>Dados básicos para reconhecer o produto.</p></div></div>
+          <div class="fields">
+            <label class="field full">Nome do produto <span class="required">*</span><input name="Produto" type="text" maxlength="120" placeholder="Ex.: Camiseta Oversized Essential" required autocomplete="off"></label>
+            <label class="field">Categoria <span class="required">*</span><select name="Categoria" id="category" required><option value="">Selecione uma categoria</option><option>Camisetas</option><option>Calças</option><option>Bermudas</option><option>Moletons</option><option>Jaquetas</option><option>Conjuntos</option><option>Bonés</option><option>Calçados</option><option>Acessórios</option><option value="Outros">Outros</option></select></label>
+            <label class="field">Marca <span class="required">*</span><input name="Marca" type="text" maxlength="80" placeholder="Ex.: Marca própria" required></label>
+            <label class="field">Código / SKU <span class="optional">(opcional)</span><input name="SKU" type="text" maxlength="50" placeholder="Ex.: FSH-001"></label>
+            <label class="field">Coleção <span class="optional">(opcional)</span><input name="Colecao" type="text" maxlength="80" placeholder="Ex.: Drop Outubro"></label>
+            <label class="field full">Descrição do produto <span class="required">*</span><textarea name="Descricao" rows="4" maxlength="1500" placeholder="Informe tecido, modelagem, detalhes, caimento e diferenciais da peça." required></textarea></label>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Valores e disponibilidade</h2><p>Utilize valores em reais e estoque disponível.</p></div></div>
+          <div class="fields">
+            <label class="field">Preço de venda (R$) <span class="required">*</span><input name="Preco" id="price" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="129,90" required></label>
+            <label class="field">Preço promocional (R$) <span class="optional">(opcional)</span><input name="PrecoPromocional" id="salePrice" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="109,90"></label>
+            <label class="field">Cores disponíveis <span class="required">*</span><input name="Cores" type="text" maxlength="200" placeholder="Ex.: Preto, branco e cinza" required></label>
+            <label class="field">Tamanhos disponíveis <span class="required">*</span><input name="Tamanhos" type="text" maxlength="200" placeholder="Ex.: P, M, G, GG ou único" required></label>
+            <label class="field full">Estoque por variação <span class="required">*</span><textarea name="EstoquePorVariacao" rows="3" maxlength="1500" placeholder="Ex.: Preto / M: 3 unidades; Preto / G: 5 unidades; Branco / M: 2 unidades" required></textarea><small>Informe a quantidade separadamente para cada combinação de cor e tamanho.</small></label>
+            <label class="field">Produto em destaque?<select name="Destaque"><option value="Não">Não</option><option value="Sim">Sim</option></select></label>
+            <label class="field">Situação<select name="Situacao"><option value="Disponível">Disponível</option><option value="Esgotado">Esgotado</option><option value="Em breve">Em breve</option></select></label>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Fotografias</h2><p>Compartilhe links acessíveis das imagens do produto.</p></div></div>
+          <div class="fields">
+            <label class="field full">Link da foto principal <span class="optional">(opcional)</span><input name="FotoPrincipal" type="url" placeholder="https://..."><small>Use um link público de imagem ou uma pasta compartilhada com acesso liberado.</small></label>
+            <label class="field full">Links de fotos adicionais <span class="optional">(opcional)</span><textarea name="FotosAdicionais" rows="3" maxlength="2500" placeholder="Cole um link por linha: frente, costas, detalhes..."></textarea></label>
+          </div>
+        </section>
+        <section class="section last-section">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Responsável</h2><p>Identificação de quem preencheu o cadastro.</p></div></div>
+          <div class="fields">
+            <label class="field">Nome <span class="required">*</span><input name="Responsavel" type="text" maxlength="100" placeholder="Seu nome" required autocomplete="name"></label>
+            <label class="field">WhatsApp de contato <span class="optional">(opcional)</span><input name="WhatsApp" type="tel" maxlength="25" placeholder="(68) 99999-9999" autocomplete="tel"></label>
+            <label class="field full">Observações <span class="optional">(opcional)</span><textarea name="Observacoes" rows="3" maxlength="1200" placeholder="Informações adicionais importantes para a loja."></textarea></label>
+          </div>
+        </section>
+        <div class="form-footer">
+          <div id="feedback" class="feedback" role="status" aria-live="polite">Os campos com * são obrigatórios.</div>
+          <div class="actions"><button type="button" class="secondary" id="clearButton">Limpar formulário</button><button type="submit" class="primary" id="submitButton">Enviar produto <span aria-hidden="true">↗</span></button></div>
+          <p class="fineprint">Ao enviar, as informações serão encaminhadas à planilha de cadastro da FS HYPE por meio do Sheet Monkey. Não informe senhas ou dados financeiros pessoais.</p>
+        </div>
+      </form>
+      <aside class="sidebar">
+        <div class="aside-card"><div class="eyebrow">ORIENTAÇÕES</div><h3>Antes de enviar</h3><ul><li>Cadastre um produto de cada vez.</li><li>Confira os preços e os tamanhos.</li><li>Detalhe o estoque por cor e tamanho.</li><li>Use links públicos para as fotos.</li><li>Após enviar, volte para cadastrar outro produto.</li></ul></div>
+        <div class="aside-card accent"><span class="accent-icon">✳</span><h3>Seu progresso fica salvo</h3><p>Enquanto estiver neste navegador, o preenchimento é salvo automaticamente neste dispositivo. Não substitui o envio à planilha.</p><span id="saveStatus" class="save-status">Aguardando preenchimento</span></div>
+        <div class="aside-note">FS HYPE <span> / </span> STREET DIVISION<br><small>CATÁLOGO DIGITAL • USO ADMINISTRATIVO</small></div>
+      </aside>
+    </div>
+  </main>
+  <footer class="footer wrap"><span>© FS HYPE — CADASTRO DE PRODUTOS</span><span>DESENVOLVIMENTO DO CATÁLOGO DIGITAL</span></footer>
+  <dialog id="clearDialog"><h2>Limpar preenchimento?</h2><p>Os dados ainda não enviados serão apagados deste navegador.</p><div class="actions"><button id="cancelClear" class="secondary" type="button">Cancelar</button><button id="confirmClear" class="primary" type="button">Limpar dados</button></div></dialog>
+</body>
+</html>

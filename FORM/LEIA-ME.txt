@@ -1,0 +1,27 @@
+FS HYPE — FORMULÁRIO DE CADASTRO DE PRODUTOS
+
+ARQUIVOS
+- index.html: página do formulário
+- styles.css: aparência e responsividade
+- script.js: validação e rascunho local
+
+COMO PUBLICAR
+1. Extraia os três arquivos na mesma pasta.
+2. Teste abrindo index.html no navegador.
+3. Publique a pasta em hospedagem estática com HTTPS (Netlify Drop, GitHub Pages, Cloudflare Pages etc.).
+4. Envie o endereço publicado ao proprietário.
+5. Faça um envio de teste e CONFIRME se os dados chegaram à planilha Sheet Monkey antes de compartilhar.
+
+COMO USAR
+- Um produto por envio.
+- Fotos: use links públicos; o formulário NÃO faz upload de arquivos.
+- Estoque por variação: escreva uma combinação cor/tamanho por item.
+- Após enviar, o Sheet Monkey poderá exibir sua própria página de confirmação.
+- O rascunho é salvo apenas no navegador atual, em localStorage, e não é sincronizado.
+- Após envio confirmado, use 'Limpar formulário' antes de cadastrar outro produto.
+
+OBSERVAÇÕES
+- A URL de envio fornecida pelo usuário já está configurada no atributo action do formulário.
+- Os nomes dos campos viram colunas na planilha.
+- O serviço de terceiros pode ter limitações, política de dados e condições de uso próprias.
+- Não envie informações confidenciais ou dados de pagamento.

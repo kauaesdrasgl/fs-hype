@@ -903,3 +903,490 @@ button {
     max-width: 145px;
   }
 }
+
+
+/* ==========================================
+   FSTORE — NOVA IDENTIDADE VISUAL
+   ========================================== */
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #090909;
+  --surface: #EDEBE7;
+  --muted: #77736E;
+  --accent: #090909;
+  --border: #dedbd6;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: #d8d4ce;
+  color: #090909;
+}
+
+.site-shell {
+  background: #ffffff;
+}
+
+/* Faixa superior */
+
+.announcement {
+  background: #090909;
+  color: #ffffff;
+  letter-spacing: 0.16em;
+}
+
+/* Cabeçalho */
+
+.site-header {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid #e8e6e2;
+}
+
+.brand {
+  color: #090909;
+}
+
+.brand span {
+  color: #77736E;
+}
+
+.nav-links a {
+  color: #55514d;
+}
+
+.nav-links a:hover {
+  color: #090909;
+}
+
+.cart-button,
+.icon-button {
+  color: #090909;
+  border-color: #d8d5d0;
+  background: transparent;
+}
+
+.cart-button:hover,
+.icon-button:hover {
+  border-color: #090909;
+}
+
+.cart-count {
+  color: #ffffff;
+  background: #090909;
+}
+
+/* Hero */
+
+.hero {
+  background: #ffffff;
+}
+
+.hero:before {
+  background: radial-gradient(
+    circle,
+    rgba(237, 235, 231, 0.9),
+    transparent 70%
+  );
+}
+
+.eyebrow {
+  color: #77736E;
+}
+
+.hero h1 {
+  color: #090909;
+}
+
+.hero h1 em {
+  color: #77736E;
+}
+
+.hero-copy {
+  color: #68645f;
+}
+
+.button-primary {
+  color: #ffffff;
+  background: #090909;
+  border-color: #090909;
+}
+
+.button-primary:hover {
+  color: #090909;
+  background: #EDEBE7;
+  border-color: #EDEBE7;
+}
+
+.button-secondary {
+  color: #090909;
+  border-color: #c9c5bf;
+}
+
+.button-secondary:hover {
+  border-color: #090909;
+  background: #EDEBE7;
+}
+
+/* Arte principal */
+
+.hero-art {
+  border-color: #dedbd6;
+  background:
+    radial-gradient(
+      ellipse at 70% 20%,
+      rgba(255, 255, 255, 0.8),
+      transparent 40%
+    ),
+    linear-gradient(145deg, #EDEBE7, #d9d6d0);
+}
+
+.hero-art:before {
+  content: "FSTORE";
+  color: rgba(9, 9, 9, 0.06);
+}
+
+.hero-art-shape {
+  background: linear-gradient(145deg, #333333, #090909 75%);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.hero-art-shape:before {
+  color: #ffffff;
+}
+
+.hero-art-shape:after {
+  color: #d0ccc5;
+}
+
+.hero-art-caption strong {
+  color: #090909;
+}
+
+.hero-art-caption span {
+  color: #55514d;
+}
+
+/* Benefícios */
+
+.benefits {
+  background: #EDEBE7;
+  border-color: #dedbd6;
+}
+
+.benefit {
+  color: #55514d;
+  border-color: #d8d5d0;
+}
+
+/* Seções */
+
+.section {
+  background: #ffffff;
+}
+
+.section-heading h2 {
+  color: #090909;
+}
+
+.section-heading p {
+  color: #77736E;
+}
+
+/* Categorias */
+
+.category-card,
+.category-card:nth-child(2),
+.category-card:nth-child(3) {
+  color: #090909;
+  background: #EDEBE7;
+  border-color: #dedbd6;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  background: #e3e0da;
+}
+
+.category-card:before {
+  border-color: rgba(9, 9, 9, 0.12);
+  box-shadow: 0 0 0 38px rgba(9, 9, 9, 0.025);
+}
+
+.category-card span {
+  color: #77736E;
+}
+
+.category-card strong {
+  color: #090909;
+}
+
+/* Produtos */
+
+.product-card {
+  background: #ffffff;
+  border-color: #e4e1dc;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+}
+
+.product-visual {
+  background: #EDEBE7;
+}
+
+.product-visual:before {
+  background: linear-gradient(145deg, #ffffff, #c9c5bf);
+  border-color: rgba(9, 9, 9, 0.08);
+}
+
+.product-visual[data-tone="light"]:before {
+  background: linear-gradient(145deg, #ffffff, #dedbd6);
+}
+
+.product-visual[data-tone="purple"]:before {
+  background: linear-gradient(145deg, #77736E, #393633);
+}
+
+.product-visual[data-tone="grey"]:before {
+  background: linear-gradient(145deg, #a7a39d, #55514d);
+}
+
+.product-mark {
+  color: #090909;
+}
+
+.product-label {
+  color: #ffffff;
+  background: #090909;
+}
+
+.product-category {
+  color: #77736E;
+}
+
+.product-name,
+.product-price strong {
+  color: #090909;
+}
+
+.product-price del {
+  color: #99948e;
+}
+
+.add-button {
+  color: #ffffff;
+  background: #090909;
+  border: 1px solid #090909;
+}
+
+.add-button:hover {
+  color: #090909;
+  background: #EDEBE7;
+}
+
+.details-button {
+  color: #090909;
+  background: transparent;
+  border: 1px solid #d8d5d0;
+}
+
+.details-button:hover {
+  border-color: #090909;
+}
+
+/* Bloco institucional */
+
+.promo {
+  background: #EDEBE7;
+  border-color: #dedbd6;
+}
+
+.promo h2 {
+  color: #090909;
+}
+
+.promo p {
+  color: #68645f;
+}
+
+/* Rodapé */
+
+.footer {
+  background: #090909;
+  border-color: #252525;
+  color: #bdb9b2;
+}
+
+.footer .brand {
+  color: #ffffff;
+}
+
+.footer a {
+  color: #d0ccc5;
+}
+
+.footer a:hover {
+  color: #ffffff;
+}
+
+/* Notificações */
+
+.toast {
+  color: #ffffff;
+  background: #090909;
+  border-color: #77736E;
+}
+
+/* Carrinho */
+
+.cart-panel {
+  color: #090909;
+  background: #ffffff;
+  border: 1px solid #dedbd6;
+  box-shadow: 0 25px 90px rgba(0, 0, 0, 0.18);
+}
+
+.cart-panel h3,
+.cart-line strong,
+.cart-total {
+  color: #090909;
+}
+
+.cart-line {
+  border-color: #e8e6e2;
+}
+
+.cart-line small,
+.empty-cart {
+  color: #77736E;
+}
+
+/* Página individual do produto */
+
+.product-breadcrumb {
+  color: #77736E;
+}
+
+.product-breadcrumb a {
+  color: #090909;
+}
+
+.product-detail-visual {
+  border-color: #dedbd6;
+}
+
+.product-detail-visual:before {
+  background: linear-gradient(145deg, #ffffff, #c9c5bf);
+  border-color: rgba(9, 9, 9, 0.08);
+}
+
+.visual-note {
+  color: #68645f;
+}
+
+.product-detail-info h1,
+.detail-prices strong {
+  color: #090909;
+}
+
+.detail-prices del {
+  color: #99948e;
+}
+
+.detail-description {
+  color: #68645f;
+}
+
+.variant-field legend {
+  color: #090909;
+}
+
+.variant-field legend span {
+  color: #77736E;
+}
+
+.variant {
+  color: #090909;
+  background: #ffffff;
+  border-color: #d8d5d0;
+}
+
+.variant:hover {
+  border-color: #090909;
+}
+
+.variant.selected {
+  color: #ffffff;
+  background: #090909;
+  border-color: #090909;
+}
+
+.stock-note {
+  color: #77736E;
+}
+
+.quantity-control {
+  border-color: #d8d5d0;
+}
+
+.quantity-control button {
+  color: #090909;
+}
+
+.quantity-control span {
+  color: #090909;
+}
+
+.detail-notice {
+  color: #393633;
+  background: #EDEBE7;
+  border-color: #dedbd6;
+}
+
+.demo-disclaimer {
+  color: #77736E;
+}
+
+.back-link {
+  color: #090909;
+  border: 1px solid #d8d5d0;
+}
+
+.back-link:hover {
+  background: #EDEBE7;
+}
+
+/* Logo */
+
+.brand-logo {
+  width: 58px;
+  height: 58px;
+  max-width: none;
+  object-fit: contain;
+}
+
+.footer .brand-logo {
+  filter: invert(1);
+}
+
+@media (max-width: 560px) {
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+    max-width: none;
+  }
+}

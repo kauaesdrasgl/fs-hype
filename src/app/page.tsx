@@ -1,77 +1,95 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowDownRight, ArrowRight, Check, ShoppingBag, X } from "lucide-react";
-import { demoProducts, formatBRL, type Product } from "@/lib/products";
-
-type CartLine = { productId: string; quantity: number; size?: string; color?: string };
-
-const CART_KEY = "fs-hype-cart-v1";
+import { demoProducts, formatBRL } from "@/lib/products";
+import {
+  CART_UPDATED_EVENT,
+  readCart,
+  writeCart,
+  type CartLine,
+} from "@/lib/cart";
 
 export default function HomePage() {
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [cartLoaded, setCartLoaded] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState("");
 
   useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(CART_KEY);
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-        if (Array.isArray(parsed)) setCart(parsed as CartLine[]);
-      }
-    } catch {
-      window.localStorage.removeItem(CART_KEY);
-    }
-    setCartLoaded(true);
-  }, []);
+    const syncCart = () => setCart(readCart());
 
-  useEffect(() => {
-    if (cartLoaded) window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  }, [cart, cartLoaded]);
+    syncCart();
+    window.addEventListener(CART_UPDATED_EVENT, syncCart);
+
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, syncCart);
+    };
+  }, []);
 
   const cartDetails = useMemo(() => {
     return cart.flatMap((line) => {
       const product = demoProducts.find((item) => item.id === line.productId);
-      return product ? [{ product, quantity: line.quantity, size: line.size, color: line.color }] : [];
+      return product
+        ? [{ product, quantity: line.quantity, size: line.size, color: line.color }]
+        : [];
     });
   }, [cart]);
 
   const cartCount = cart.reduce((total, line) => total + line.quantity, 0);
+
   const subtotal = cartDetails.reduce(
     (total, line) => total + line.product.priceCents * line.quantity,
     0,
   );
 
-  function addToCart(product: Product) {
-    setCart((current) => {
-      const existing = current.find((line) => line.productId === product.id && !line.size && !line.color);
-      if (existing) {
-        return current.map((line) =>
-          line.productId === product.id && !line.size && !line.color
-            ? { ...line, quantity: Math.min(line.quantity + 1, 10) }
-            : line,
+
+  function changeQuantity(
+    productId: string,
+    delta: number,
+    size?: string,
+    color?: string,
+  ) {
+    const product = demoProducts.find((item) => item.id === productId);
+    if (!product) return;
+
+    const line = cart.find(
+      (item) =>
+        item.productId === productId &&
+        item.size === size &&
+        item.color === color,
+    );
+
+    if (!line) return;
+
+    const stock = product.stockByVariant[`${size}|${color}`] ?? 0;
+    const nextQuantity = line.quantity + delta;
+
+    if (nextQuantity > Math.min(stock, 10)) return;
+
+    const updatedCart =
+      nextQuantity <= 0
+        ? cart.filter(
+          (item) =>
+            !(
+              item.productId === productId &&
+              item.size === size &&
+              item.color === color
+            ),
+        )
+        : cart.map((item) =>
+          item.productId === productId &&
+            item.size === size &&
+            item.color === color
+            ? { ...item, quantity: nextQuantity }
+            : item,
         );
-      }
-      return [...current, { productId: product.id, quantity: 1 }];
-    });
-    setToast(`${product.name} adicionado ao carrinho`);
-    window.setTimeout(() => setToast(""), 2600);
+
+    writeCart(updatedCart);
+    setCart(updatedCart);
   }
 
-  function changeQuantity(productId: string, delta: number, size?: string, color?: string) {
-    setCart((current) =>
-      current
-        .map((line) =>
-          line.productId === productId && line.size === size && line.color === color
-            ? { ...line, quantity: line.quantity + delta }
-            : line,
-        )
-        .filter((line) => line.quantity > 0),
-    );
-  }
 
   function checkout() {
     setToast("O WhatsApp comercial será configurado na próxima etapa.");
@@ -79,12 +97,12 @@ export default function HomePage() {
 
   return (
     <main className="site-shell">
-      <div className="announcement">ESTILO É ATITUDE — BEM-VINDO À FS HYPE</div>
+      <div className="announcement">FSTORE — SEU ESTILO, SUA IDENTIDADE</div>
 
       <header className="site-header">
         <div className="container header-inner">
-          <Link className="brand" href="/" aria-label="FS HYPE — Página inicial">
-            <img src="/images/fs-hype-logo.png" alt="FS HYPE" className="brand-logo" />
+          <Link className="brand" href="/" aria-label="FStore — Página inicial">
+            <img src="/images/fstore-logo.png" alt="FStore" className="brand-logo" />
           </Link>
           <nav className="nav-links" aria-label="Navegação principal">
             <a href="#novidades">Novidades</a>
@@ -102,7 +120,7 @@ export default function HomePage() {
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <div className="eyebrow">Streetwear • Drop demonstrativo</div>
+            <div className="eyebrow">STREETWEAR • OVERSIZED • CASUAL</div>
             <h1>Vista sua<br /><em>própria</em> atitude.</h1>
             <p className="hero-copy">
               Peças com presença. Uma identidade feita para quem não precisa seguir o padrão
@@ -113,11 +131,11 @@ export default function HomePage() {
               <a className="button-secondary" href="#categorias">VER CATEGORIAS <ArrowDownRight size={15} /></a>
             </div>
           </div>
-          <div className="hero-art" role="img" aria-label="Arte gráfica conceitual da FS HYPE">
+          <div className="hero-art" role="img" aria-label="Arte gráfica conceitual da FStore">
             <div className="hero-art-shape" />
             <div className="hero-art-caption">
-              <strong>FS HYPE / STREET DIVISION</strong>
-              <span>DROP 001 — CONCEPT</span>
+              <strong>FSTORE / STYLE & IDENTITY</strong>
+              <span>STREETWEAR • OVERSIZED • CASUAL</span>
             </div>
           </div>
         </div>
@@ -125,9 +143,9 @@ export default function HomePage() {
 
       <section className="benefits" aria-label="Destaques da loja">
         <div className="container benefit-grid">
-          <div className="benefit">✳ CURADORIA STREETWEAR</div>
-          <div className="benefit">✳ COMPRA SIMPLES PELO WHATSAPP</div>
-          <div className="benefit">✳ ESTILO SEM FÓRMULA</div>
+          <div className="benefit">✳ ESTILO PARA TODAS AS OCASIÕES</div>
+          <div className="benefit">✳ VARIEDADE DE ESTILOS</div>
+          <div className="benefit">✳ SUA IDENTIDADE, SEU JEITO</div>
         </div>
       </section>
 
@@ -135,12 +153,12 @@ export default function HomePage() {
         <div className="container">
           <div className="section-heading">
             <div><div className="eyebrow">Encontre sua peça</div><h2>Explore por categoria</h2></div>
-            <p>Uma base visual para organizar as coleções reais da loja quando o catálogo forfornecido.</p>
+            <p>Uma base visual para organizar as coleções reais da loja quando o catálogo for fornecido.</p>
           </div>
           <div className="category-grid">
-            <a className="category-card" href="#novidades"><span>01 / ESSENCIAIS</span><strong>Camisetas</strong></a>
-            <a className="category-card" href="#novidades"><span>02 / CAMADAS</span><strong>Moletons</strong></a>
-            <a className="category-card" href="#novidades"><span>03 / SILHUETAS</span><strong>Calças & cargos</strong></a>
+            <a className="category-card" href="#novidades"><span>01 / ESSENCIAIS</span><strong>Streetwear</strong></a>
+            <a className="category-card" href="#novidades"><span>02 / CAMADAS</span><strong>Oversized</strong></a>
+            <a className="category-card" href="#novidades"><span>03 / SILHUETAS</span><strong>Casual</strong></a>
           </div>
         </div>
       </section>
@@ -148,7 +166,7 @@ export default function HomePage() {
       <section className="section" id="novidades" style={{ paddingTop: 12 }}>
         <div className="container">
           <div className="section-heading">
-            <div><div className="eyebrow">Seleção inicial</div><h2>Peças em destaque<span style={{ color: "#9B5CFF" }}>.</span></h2></div>
+            <div><div className="eyebrow">Seleção inicial</div><h2>Peças em destaque<span style={{ color: "#77736E" }}>.</span></h2></div>
             <p>Os itens e preços abaixo são demonstrativos. Serão substituídos pelo catálogo real do cliente.</p>
           </div>
           <div className="product-grid">
@@ -182,7 +200,7 @@ export default function HomePage() {
             <div>
               <div className="eyebrow">Sua identidade. Suas regras.</div>
               <h2>Não vista o comum.</h2>
-              <p>FS HYPE — moda urbana com atitude. Texto institucional provisório, sujeito àaprovação do cliente.</p>
+              <p>FStore — moda urbana com atitude. Texto institucional provisório, sujeito à aprovação do cliente.</p>
             </div>
             <a className="button-primary" href="#novidades">CONHECER PEÇAS <ArrowRight size={15} /></a>
           </div>
@@ -191,8 +209,8 @@ export default function HomePage() {
 
       <footer className="footer">
         <div className="container footer-inner">
-          <a className="brand" href="#">FS<span>.</span>HYPE</a>
-          <span>© {new Date().getFullYear()} FS HYPE. Conteúdo demonstrativo para desenvolvimento.</span>
+          <a className="brand" href="#"><img src="/images/fstore-logo.png" alt="FStore" className="brand-logo" /></a>
+          <span>© {new Date().getFullYear()} FStore. Conteúdo demonstrativo para desenvolvimento.</span>
           <a href="#sobre">Sobre a marca</a>
         </div>
       </footer>
@@ -207,19 +225,59 @@ export default function HomePage() {
             <p className="empty-cart">Seu carrinho ainda está vazio. Explore a seleção e adicione suas peças favoritas.</p>
           ) : (
             <>
+
               {cartDetails.map(({ product, quantity, size, color }) => (
-                <div className="cart-line" key={product.id}>
-                  <div><strong>{product.name}</strong><small>{formatBRL(product.priceCents)} por unidade</small></div>
+                <div
+                  className="cart-line"
+                  key={`${product.id}-${size}-${color}`}
+                >
+                  <div>
+                    <strong>{product.name}</strong>
+                    <small>
+                      Tamanho: {size || "Não informado"} · Cor: {color || "Não informada"}
+                    </small>
+                    <small>{formatBRL(product.priceCents)} por unidade</small>
+                  </div>
+
                   <div style={{ textAlign: "right" }}>
-                    <strong>{formatBRL(product.priceCents * quantity)}</strong>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 7 }}>
-                      <button className="icon-button" onClick={() => changeQuantity(product.id, -1, size, color)} aria-label={`Diminuir ${product.name}`}>−</button>
+                    <strong>
+                      {formatBRL(product.priceCents * quantity)}
+                    </strong>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginTop: 7,
+                      }}
+                    >
+                      <button
+                        className="icon-button"
+                        onClick={() =>
+                          changeQuantity(product.id, -1, size, color)
+                        }
+                        aria-label={`Diminuir ${product.name}`}
+                      >
+                        −
+                      </button>
+
                       <span>{quantity}</span>
-                      <button className="icon-button" onClick={() => changeQuantity(product.id, 1, size, color)} aria-label={`Aumentar ${product.name}`}>+</button>
+
+                      <button
+                        className="icon-button"
+                        onClick={() =>
+                          changeQuantity(product.id, 1, size, color)
+                        }
+                        aria-label={`Aumentar ${product.name}`}
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
                 </div>
               ))}
+
               <div className="cart-total"><span>Subtotal</span><span>{formatBRL(subtotal)}</span></div>
               <button className="button-primary" style={{ width: "100%", gap: 8 }} onClick={checkout}>CONTINUAR PARA O PEDIDO <ArrowRight size={15} /></button>
               <p className="empty-cart">O fluxo de pedido pelo WhatsApp será conectado após recebermos o número oficial e as regras comerciais da loja.</p>

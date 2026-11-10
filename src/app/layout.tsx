@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FS HYPE — Streetwear para quem tem identidade",
+  title: "FStore | Streetwear, Oversized e Casual",
   description:
-    "Explore a seleção FS HYPE: streetwear, peças marcantes e estilo sem pedir licença.",
+    "Descubra a FStore: moda streetwear, oversized e casual. Encontre peças que combinam com seu estilo e sua identidade.",
 };
 
 export default function RootLayout({

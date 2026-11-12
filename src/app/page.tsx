@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowDownRight, ArrowRight, Check, ShoppingBag, X } from "lucide-react";
 import { demoProducts, formatBRL } from "@/lib/products";
@@ -16,17 +16,39 @@ export default function HomePage() {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("entrega");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [addressReference, setAddressReference] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Pix");
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
-    const syncCart = () => setCart(readCart());
+  const syncCart = () => setCart(readCart());
 
-    syncCart();
-    window.addEventListener(CART_UPDATED_EVENT, syncCart);
+  syncCart();
 
-    return () => {
-      window.removeEventListener(CART_UPDATED_EVENT, syncCart);
-    };
-  }, []);
+  const url = new URL(window.location.href);
+
+  if (url.searchParams.get("cart") === "open") {
+    setCartOpen(true);
+
+    url.searchParams.delete("cart");
+
+    window.history.replaceState(
+      {},
+      "",
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+  }
+
+  window.addEventListener(CART_UPDATED_EVENT, syncCart);
+
+  return () => {
+    window.removeEventListener(CART_UPDATED_EVENT, syncCart);
+  };
+}, []);
 
   const cartDetails = useMemo(() => {
     return cart.flatMap((line) => {
@@ -91,8 +113,52 @@ export default function HomePage() {
   }
 
 
-  function checkout() {
-    setToast("O WhatsApp comercial será configurado na próxima etapa.");
+  function checkout(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (cartDetails.length === 0) return;
+
+    const productsMessage = cartDetails
+      .map(({ product, quantity, size, color }) =>
+        [
+          `• ${product.name}`,
+          `  Tamanho: ${size || "Não informado"}`,
+          `  Cor: ${color || "Não informada"}`,
+          `  Quantidade: ${quantity}`,
+          `  Valor unitário: ${formatBRL(product.priceCents)}`,
+          `  Total: ${formatBRL(product.priceCents * quantity)}`,
+        ].join("\n"),
+      )
+      .join("\n\n");
+
+    const deliveryMessage =
+      deliveryMethod === "entrega"
+        ? `Entrega\nEndereço: ${customerAddress}\nReferência: ${addressReference || "Não informada"}\nTaxa de entrega: a combinar conforme a distância.`
+        : "Retirada na loja";
+
+    const message = [
+      "Olá! Gostaria de realizar um pedido pela FStore.",
+      "",
+      "DADOS DO CLIENTE",
+      `Nome: ${customerName}`,
+      `Telefone: ${customerPhone}`,
+      "",
+      "PRODUTOS",
+      productsMessage,
+      "",
+      "ENTREGA / RETIRADA",
+      deliveryMessage,
+      "",
+      `Forma de pagamento: ${paymentMethod}`,
+      "",
+      `SUBTOTAL: ${formatBRL(subtotal)}`,
+      "",
+      "Aguardo a confirmação do pedido. Obrigado!",
+    ].join("\n");
+
+    const whatsappUrl = `https://wa.me/5568981094329?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -278,9 +344,133 @@ export default function HomePage() {
                 </div>
               ))}
 
-              <div className="cart-total"><span>Subtotal</span><span>{formatBRL(subtotal)}</span></div>
-              <button className="button-primary" style={{ width: "100%", gap: 8 }} onClick={checkout}>CONTINUAR PARA O PEDIDO <ArrowRight size={15} /></button>
-              <p className="empty-cart">O fluxo de pedido pelo WhatsApp será conectado após recebermos o número oficial e as regras comerciais da loja.</p>
+              <div className="cart-total">
+                <span>Subtotal</span>
+                <span>{formatBRL(subtotal)}</span>
+              </div>
+
+              {!checkoutOpen ? (
+                <button
+                  type="button"
+                  className="button-primary"
+                  style={{ width: "100%", gap: 8 }}
+                  onClick={() => setCheckoutOpen(true)}
+                >
+                  CONTINUAR PARA O PEDIDO <ArrowRight size={15} />
+                </button>
+              ) : (
+                <form className="checkout-form" onSubmit={checkout}>
+                  <div className="checkout-heading">
+                    <h4>Finalizar pedido</h4>
+                    <p>Informe seus dados para continuar pelo WhatsApp.</p>
+                  </div>
+
+                  <div className="checkout-field">
+                    <label htmlFor="customerName">Nome completo</label>
+                    <input
+                      id="customerName"
+                      type="text"
+                      value={customerName}
+                      onChange={(event) => setCustomerName(event.target.value)}
+                      placeholder="Digite seu nome completo"
+                      autoComplete="name"
+                      required
+                    />
+                  </div>
+
+                  <div className="checkout-field">
+                    <label htmlFor="customerPhone">Telefone / WhatsApp</label>
+                    <input
+                      id="customerPhone"
+                      type="tel"
+                      value={customerPhone}
+                      onChange={(event) => setCustomerPhone(event.target.value)}
+                      placeholder="(68) 99999-9999"
+                      autoComplete="tel"
+                      required
+                    />
+                  </div>
+
+                  <div className="checkout-field">
+                    <label htmlFor="deliveryMethod">Como deseja receber?</label>
+                    <select
+                      id="deliveryMethod"
+                      value={deliveryMethod}
+                      onChange={(event) => setDeliveryMethod(event.target.value)}
+                    >
+                      <option value="entrega">Entrega</option>
+                      <option value="retirada">Retirada na loja</option>
+                    </select>
+                  </div>
+
+                  {deliveryMethod === "entrega" && (
+                    <>
+                      <div className="checkout-field">
+                        <label htmlFor="customerAddress">Endereço de entrega</label>
+                        <input
+                          id="customerAddress"
+                          type="text"
+                          value={customerAddress}
+                          onChange={(event) => setCustomerAddress(event.target.value)}
+                          placeholder="Rua, número, bairro e cidade"
+                          autoComplete="street-address"
+                          required
+                        />
+                      </div>
+
+                      <div className="checkout-field">
+                        <label htmlFor="addressReference">Referência do endereço</label>
+                        <input
+                          id="addressReference"
+                          type="text"
+                          value={addressReference}
+                          onChange={(event) => setAddressReference(event.target.value)}
+                          placeholder="Ex.: próximo à praça"
+                        />
+                      </div>
+
+                      <p className="checkout-note">
+                        A taxa de entrega será combinada diretamente com a loja, conforme a distância.
+                      </p>
+                    </>
+                  )}
+
+                  <div className="checkout-field">
+                    <label htmlFor="paymentMethod">Forma de pagamento</label>
+                    <select
+                      id="paymentMethod"
+                      value={paymentMethod}
+                      onChange={(event) => setPaymentMethod(event.target.value)}
+                    >
+                      <option value="Pix">Pix</option>
+                      <option value="Dinheiro">Dinheiro</option>
+                      <option value="Cartão de crédito">Cartão de crédito</option>
+                      <option value="Cartão de débito">Cartão de débito</option>
+                    </select>
+                  </div>
+
+                  <div className="checkout-summary">
+                    <span>Subtotal dos produtos</span>
+                    <strong>{formatBRL(subtotal)}</strong>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="button-primary"
+                    style={{ width: "100%", gap: 8 }}
+                  >
+                    ENVIAR PEDIDO PELO WHATSAPP <ArrowRight size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="checkout-back"
+                    onClick={() => setCheckoutOpen(false)}
+                  >
+                    VOLTAR AO CARRINHO
+                  </button>
+                </form>
+              )}
             </>
           )}
         </div>

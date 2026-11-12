@@ -1390,3 +1390,346 @@ body {
     max-width: none;
   }
 }
+
+/* Checkout FStore */
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.checkout-heading {
+  margin-bottom: 2px;
+}
+
+.checkout-heading h4 {
+  margin: 0 0 6px;
+  color: #090909;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.checkout-heading p {
+  margin: 0;
+  color: #77736E;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.checkout-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.checkout-field label {
+  color: #242424;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.checkout-field input,
+.checkout-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid #dedbd6;
+  border-radius: 5px;
+  outline: none;
+  background: #ffffff;
+  color: #090909;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.checkout-field input::placeholder {
+  color: #aaa6a0;
+}
+
+.checkout-field input:focus,
+.checkout-field select:focus {
+  border-color: #77736E;
+  box-shadow: 0 0 0 3px rgba(119, 115, 110, 0.12);
+}
+
+.checkout-field select {
+  cursor: pointer;
+}
+
+.checkout-field select option {
+  background: #ffffff;
+  color: #090909;
+}
+
+.checkout-note {
+  margin: -5px 0 0;
+  padding: 11px 12px;
+  border-left: 2px solid #77736E;
+  background: #f6f5f3;
+  color: #66615b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.checkout-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #e8e6e2;
+  color: #090909;
+  font-size: 13px;
+}
+
+.checkout-summary strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.checkout-back {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dedbd6;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #55514c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.checkout-back:hover {
+  background: #f6f5f3;
+  border-color: #aaa6a0;
+}
+
+@media (max-width: 480px) {
+  .cart-panel {
+    right: 10px;
+    top: 10px;
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    padding: 16px;
+  }
+
+  .checkout-form {
+    gap: 14px;
+  }
+}
+
+/* FSTORE ADMIN */
+.admin-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #09090b;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 430px;
+  padding: 42px;
+  border: 1px solid #29292e;
+  border-radius: 12px;
+  background: #111114;
+}
+
+.admin-login-brand,
+.admin-dashboard-brand {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  text-decoration: none;
+}
+
+.admin-login-brand span,
+.admin-dashboard-brand span {
+  color: #c8a7ff;
+}
+
+.admin-login-eyebrow,
+.admin-dashboard-eyebrow {
+  margin-top: 42px;
+  color: #c8a7ff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.admin-login-card h1,
+.admin-dashboard-content h1 {
+  margin: 12px 0;
+  color: #fff;
+  font-size: 30px;
+  letter-spacing: -0.05em;
+}
+
+.admin-login-description,
+.admin-dashboard-welcome {
+  color: #aaa5b4;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.admin-login-form label {
+  color: #e5e5e5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-login-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #36363d;
+  border-radius: 6px;
+  outline: none;
+  color: #fff;
+  background: #09090b;
+}
+
+.admin-login-form input:focus {
+  border-color: #c8a7ff;
+}
+
+.admin-login-form button,
+.admin-logout-button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 6px;
+  color: #10091b;
+  background: #c8a7ff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-login-form button:disabled,
+.admin-logout-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.admin-login-error {
+  color: #ff8585;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.admin-login-back {
+  display: block;
+  margin-top: 24px;
+  color: #aaa5b4;
+  text-align: center;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: #09090b;
+}
+
+.admin-dashboard-header {
+  min-height: 76px;
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #25252a;
+}
+
+.admin-dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-dashboard-brand small {
+  color: #aaa5b4;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.admin-logout-button {
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.admin-dashboard-content {
+  width: min(1120px, 90%);
+  margin: 0 auto;
+  padding: 55px 0;
+}
+
+.admin-dashboard-content .admin-dashboard-eyebrow {
+  margin-top: 0;
+}
+
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 38px;
+}
+
+.admin-dashboard-card {
+  min-height: 190px;
+  padding: 25px;
+  border: 1px solid #29292e;
+  border-radius: 9px;
+  background: #111114;
+}
+
+.admin-dashboard-card > span {
+  color: #c8a7ff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-dashboard-card h2 {
+  margin: 22px 0 8px;
+  color: #fff;
+  font-size: 19px;
+}
+
+.admin-dashboard-card p {
+  color: #aaa5b4;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.admin-dashboard-card small {
+  color: #c8a7ff;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 600px) {
+  .admin-login-card {
+    padding: 28px 22px;
+  }
+
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-header {
+    padding: 0 5%;
+  }
+}

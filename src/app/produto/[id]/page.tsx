@@ -2,10 +2,14 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Check, ShoppingBag, Minus, Plus } from "lucide-react";
 import { getProduct, formatBRL } from "@/lib/products";
-import { readCart, writeCart } from "@/lib/cart";
+import {
+  readCart,
+  writeCart,
+  CART_UPDATED_EVENT,
+} from "@/lib/cart";
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
@@ -14,6 +18,25 @@ export default function ProductPage() {
   const [color, setColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [notice, setNotice] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const syncCart = () => {
+      const currentCart = readCart();
+
+      setCartCount(
+        currentCart.reduce((total, line) => total + line.quantity, 0),
+      );
+    };
+
+    syncCart();
+
+    window.addEventListener(CART_UPDATED_EVENT, syncCart);
+
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, syncCart);
+    };
+  }, []);
 
   if (!product) {
     return (
@@ -86,6 +109,15 @@ export default function ProductPage() {
               alt="FStore"
               className="brand-logo"
             />
+          </Link>
+
+          <Link
+            className="details-button back-link"
+            href="/?cart=open"
+            aria-label={`Abrir carrinho com ${cartCount} itens`}
+          >
+            <ShoppingBag size={15} />
+            CARRINHO ({cartCount})
           </Link>
 
           <Link className="details-button back-link" href="/">

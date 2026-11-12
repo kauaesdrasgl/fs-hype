@@ -2,8 +2,9 @@
 
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, X, Package, Star } from "lucide-react";
-import { createProduct } from "./actions";
+import { Plus, Search, X, ImagePlus } from "lucide-react";
+import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { attachProductImages, createProduct } from "./actions";
 
 export type ProductCategory = { id: string; name: string };
 export type AdminProduct = {
@@ -22,7 +23,15 @@ export type AdminProduct = {
   product_variants: { id: string; stock_quantity: number; is_active: boolean }[];
 };
 
-type ColorDraft = { name: string; hex: string; sizes: string };
+type ColorDraft = { name: string; hex: string; sizes: string; images: File[] };
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGES_PER_COLOR = 5;
+const IMAGE_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/avif": "avif",
+};
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
 export default function ProductsManager({ products, categories }: { products: AdminProduct[]; categories: ProductCategory[] }) {
@@ -37,7 +46,7 @@ export default function ProductsManager({ products, categories }: { products: Ad
   const [salePrice, setSalePrice] = useState("");
   const [featured, setFeatured] = useState(false);
   const [status, setStatus] = useState<"draft" | "published">("draft");
-  const [colors, setColors] = useState<ColorDraft[]>([{ name: "Preto", hex: "#090909", sizes: "P, M, G, GG" }]);
+  const [colors, setColors] = useState<ColorDraft[]>([{ name: "Preto", hex: "#090909", sizes: "P, M, G, GG", images: [] }]);
   const [feedback, setFeedback] = useState("");
   const [feedbackError, setFeedbackError] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -52,7 +61,8 @@ export default function ProductsManager({ products, categories }: { products: Ad
 
   function resetForm() {
     setName(""); setDescription(""); setCategoryId(""); setPrice(""); setCostPrice(""); setSalePrice("");
-    setFeatured(false); setStatus("draft"); setColors([{ name: "Preto", hex: "#090909", sizes: "P, M, G, GG" }]);
+    setFeatured(false); setStatus("draft");
+    setColors([{ name: "Preto", hex: "#090909", sizes: "P, M, G, GG", images: [] }]);
     setFeedback("");
   }
 
@@ -64,6 +74,16 @@ export default function ProductsManager({ products, categories }: { products: Ad
       hex: color.hex,
       sizes: color.sizes.split(",").map((size) => size.trim()).filter(Boolean),
     }));
+
+    const invalidImage = colors.some((color) => color.images.some((file) =>
+      !IMAGE_TYPES[file.type] || file.size > MAX_IMAGE_SIZE
+    ));
+    if (invalidImage) {
+      setFeedback("Use imagens JPG, PNG, WEBP ou AVIF com até 5 MB cada.");
+      setFeedbackError(true);
+      return;
+    }
+
     startTransition(async () => {
       const result = await createProduct({
         name, description, category_id: categoryId || null,
@@ -71,18 +91,105 @@ export default function ProductsManager({ products, categories }: { products: Ad
         sale_price: salePrice === "" ? null : Number(salePrice),
         is_featured: featured, status, colors: parsedColors,
       });
-      setFeedback(result.message);
-      setFeedbackError(!result.success);
-      if (result.success) {
-        setModalOpen(false);
-        resetForm();
-        router.refresh();
+
+      if (!result.success) {
+        setFeedback(result.message);
+        setFeedbackError(true);
+        return;
       }
+
+      const selectedImages = colors.flatMap((color, colorIndex) =>
+        color.images.map((file, imageIndex) => ({
+          colorIndex,
+          imageIndex,
+          file,
+          colorName: color.name,
+        }))
+      );
+
+      if (selectedImages.length > 0) {
+        const supabase = createBrowserSupabaseClient();
+        const uploadedPaths: string[] = [];
+        const imageRows: {
+          color_id: string;
+          storage_path: string;
+          alt_text: string;
+          display_order: number;
+        }[] = [];
+
+        try {
+          for (const item of selectedImages) {
+            const savedColor = result.colors[item.colorIndex];
+            if (!savedColor) throw new Error("Não foi possível identificar a cor de uma das imagens.");
+
+            const extension = IMAGE_TYPES[item.file.type];
+            const path = `products/${result.productId}/${savedColor.id}/${crypto.randomUUID()}.${extension}`;
+            const { error: uploadError } = await supabase.storage
+              .from("product-images")
+              .upload(path, item.file, {
+                cacheControl: "3600",
+                contentType: item.file.type,
+                upsert: false,
+              });
+
+            if (uploadError) throw new Error(uploadError.message);
+            uploadedPaths.push(path);
+            imageRows.push({
+              color_id: savedColor.id,
+              storage_path: path,
+              alt_text: `${name} - ${item.colorName}`,
+              display_order: item.imageIndex,
+            });
+          }
+
+          const attached = await attachProductImages({
+            product_id: result.productId,
+            images: imageRows,
+          });
+          if (!attached.success) throw new Error(attached.message);
+        } catch (error) {
+          if (uploadedPaths.length > 0) {
+            await supabase.storage.from("product-images").remove(uploadedPaths);
+          }
+          setFeedback(`O produto foi cadastrado, mas as imagens não foram salvas: ${error instanceof Error ? error.message : "erro inesperado"}`);
+          setFeedbackError(true);
+          setModalOpen(false);
+          resetForm();
+          router.refresh();
+          return;
+        }
+      }
+
+      setFeedback(selectedImages.length > 0
+        ? "Produto e imagens cadastrados com sucesso."
+        : result.message);
+      setFeedbackError(false);
+      setModalOpen(false);
+      resetForm();
+      router.refresh();
     });
   }
 
-  function updateColor(index: number, key: keyof ColorDraft, value: string) {
+  function updateColor(index: number, key: "name" | "hex" | "sizes", value: string) {
     setColors((current) => current.map((color, i) => i === index ? { ...color, [key]: value } : color));
+  }
+
+  function updateColorImages(index: number, files: FileList | null) {
+    if (!files) return;
+    const selected = Array.from(files);
+    if (selected.length > MAX_IMAGES_PER_COLOR) {
+      setFeedback(`Selecione no máximo ${MAX_IMAGES_PER_COLOR} imagens por cor.`);
+      setFeedbackError(true);
+      return;
+    }
+    const invalid = selected.find((file) => !IMAGE_TYPES[file.type] || file.size > MAX_IMAGE_SIZE);
+    if (invalid) {
+      setFeedback("Use imagens JPG, PNG, WEBP ou AVIF com até 5 MB cada.");
+      setFeedbackError(true);
+      return;
+    }
+    setFeedback("");
+    setColors((current) => current.map((color, i) => i === index ? { ...color, images: selected } : color));
   }
 
   return (
@@ -133,20 +240,26 @@ export default function ProductsManager({ products, categories }: { products: Ad
               <label>Preço promocional (R$)<input type="number" min="0.01" step="0.01" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} /></label>
             </div>
             <section className="admin-product-colors">
-              <div className="admin-product-section-heading"><div><strong>Cores e tamanhos</strong><small>O sistema criará uma variação para cada combinação.</small></div><button type="button" className="admin-category-secondary" onClick={() => setColors((current) => [...current, { name: "", hex: "#000000", sizes: "P, M, G, GG" }])} disabled={colors.length >= 20}><Plus size={15} /> Adicionar cor</button></div>
+              <div className="admin-product-section-heading"><div><strong>Cores, tamanhos e fotos</strong><small>As variações serão criadas automaticamente. As fotos ficam vinculadas à respectiva cor.</small></div><button type="button" className="admin-category-secondary" onClick={() => setColors((current) => [...current, { name: "", hex: "#000000", sizes: "P, M, G, GG", images: [] }])} disabled={colors.length >= 20}><Plus size={15} /> Adicionar cor</button></div>
               {colors.map((color, index) => <div className="admin-product-color-row" key={index}>
                 <label>Cor<input value={color.name} onChange={(e) => updateColor(index, "name", e.target.value)} required maxLength={40} placeholder="Ex.: Preto" /></label>
                 <label className="admin-product-hex">Identificação visual<input type="color" value={color.hex} onChange={(e) => updateColor(index, "hex", e.target.value)} /></label>
                 <label className="admin-product-sizes">Tamanhos separados por vírgula<input value={color.sizes} onChange={(e) => updateColor(index, "sizes", e.target.value)} required placeholder="P, M, G, GG" /></label>
                 {colors.length > 1 && <button type="button" className="admin-product-remove-color" onClick={() => setColors((current) => current.filter((_, i) => i !== index))} aria-label={`Remover cor ${color.name || index + 1}`}><X size={16} /></button>}
+                <label className="admin-product-images">
+                  <span><ImagePlus size={16} /> Fotos desta cor</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple onChange={(e) => updateColorImages(index, e.target.files)} />
+                  <small>Até 5 imagens por cor · JPG, PNG, WEBP ou AVIF · máximo 5 MB por imagem</small>
+                  {color.images.length > 0 && <small className="admin-product-image-list">{color.images.map((file) => file.name).join(" · ")}</small>}
+                </label>
               </div>)}
             </section>
             <div className="admin-product-form-grid admin-product-options">
               <label className="admin-product-check"><input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} /> Produto em destaque</label>
               <label>Status<select value={status} onChange={(e) => setStatus(e.target.value as "draft" | "published")}><option value="draft">Rascunho</option><option value="published">Publicado</option></select></label>
             </div>
-            {feedback && <p className="admin-category-feedback is-error" role="alert">{feedback}</p>}
-            <footer><button type="button" className="admin-category-secondary" onClick={() => setModalOpen(false)} disabled={pending}>Cancelar</button><button type="submit" className="admin-category-primary" disabled={pending}>{pending ? "Cadastrando..." : "Cadastrar produto"}</button></footer>
+            {feedback && <p className={`admin-category-feedback ${feedbackError ? "is-error" : "is-success"}`} role="alert">{feedback}</p>}
+            <footer><button type="button" className="admin-category-secondary" onClick={() => setModalOpen(false)} disabled={pending}>Cancelar</button><button type="submit" className="admin-category-primary" disabled={pending}>{pending ? "Cadastrando produto e imagens..." : "Cadastrar produto"}</button></footer>
           </form>
         </section>
       </div>}

@@ -2033,3 +2033,237 @@ body {
   .admin-category-modal form footer { flex-direction: column-reverse; }
   .admin-category-modal form footer button { width: 100%; }
 }
+
+
+/* FSTORE ADMIN — IDENTIDADE MONOCROMÁTICA */
+/* Alinha login, dashboard e módulos administrativos à identidade pública da FStore. */
+:root {
+  --fstore-black: #090909;
+  --fstore-white: #ffffff;
+  --fstore-surface: #f5f4f1;
+  --fstore-surface-strong: #edebe7;
+  --fstore-muted: #77736e;
+  --fstore-border: #dedbd6;
+  --fstore-accent: #090909;
+}
+
+.admin-login-page,
+.admin-dashboard {
+  color-scheme: light;
+  color: var(--fstore-black);
+  background: var(--fstore-white);
+}
+
+.admin-login-card,
+.admin-dashboard-card,
+.admin-category-stats article,
+.admin-category-table-wrap,
+.admin-category-modal {
+  color: var(--fstore-black);
+  border-color: var(--fstore-border);
+  background: var(--fstore-white);
+  box-shadow: 0 8px 28px rgba(9, 9, 9, 0.045);
+}
+
+.admin-login-brand,
+.admin-dashboard-brand,
+.admin-login-card h1,
+.admin-dashboard-content h1,
+.admin-dashboard-card h2,
+.admin-category-stats strong,
+.admin-category-modal header h2 {
+  color: var(--fstore-black);
+}
+
+.admin-login-brand span,
+.admin-dashboard-brand span,
+.admin-login-eyebrow,
+.admin-dashboard-eyebrow,
+.admin-dashboard-card > span,
+.admin-dashboard-card small,
+.admin-category-back,
+.admin-category-code,
+.admin-category-table code,
+.admin-category-modal header span {
+  color: var(--fstore-muted);
+}
+
+.admin-login-description,
+.admin-dashboard-welcome,
+.admin-dashboard-brand small,
+.admin-dashboard-card p,
+.admin-category-stats span,
+.admin-category-footnote,
+.admin-category-empty {
+  color: #68645f;
+}
+
+.admin-login-form label,
+.admin-category-modal form > label,
+.admin-category-table td {
+  color: #33312e;
+}
+
+.admin-login-form input,
+.admin-category-search,
+.admin-category-modal input,
+.admin-category-modal textarea {
+  color: var(--fstore-black);
+  border-color: #d3d0ca;
+  background: #fff;
+}
+
+.admin-login-form input::placeholder,
+.admin-category-search input::placeholder,
+.admin-category-modal input::placeholder,
+.admin-category-modal textarea::placeholder {
+  color: #96918a;
+}
+
+.admin-login-form input:focus,
+.admin-category-search:focus-within,
+.admin-category-modal input:focus,
+.admin-category-modal textarea:focus {
+  border-color: var(--fstore-black);
+  box-shadow: 0 0 0 3px rgba(9, 9, 9, 0.07);
+}
+
+.admin-login-form button,
+.admin-logout-button,
+.admin-category-primary {
+  color: #fff;
+  border: 1px solid var(--fstore-black);
+  background: var(--fstore-black);
+}
+
+.admin-login-form button:hover,
+.admin-logout-button:hover,
+.admin-category-primary:hover {
+  color: var(--fstore-black);
+  background: #edebe7;
+  border-color: #edebe7;
+}
+
+.admin-login-back {
+  color: var(--fstore-muted);
+}
+
+.admin-login-back:hover,
+.admin-category-back:hover {
+  color: var(--fstore-black);
+}
+
+.admin-dashboard-header {
+  border-bottom-color: var(--fstore-border);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.admin-dashboard-card-link:hover {
+  border-color: #99948c;
+  box-shadow: 0 12px 30px rgba(9, 9, 9, 0.08);
+}
+
+.admin-category-heading-icon {
+  color: var(--fstore-black);
+  border-color: var(--fstore-border);
+  background: var(--fstore-surface);
+}
+
+.admin-category-search {
+  color: #68645f;
+}
+
+.admin-category-search input {
+  color: var(--fstore-black);
+}
+
+.admin-category-primary,
+.admin-category-secondary {
+  border-radius: 5px;
+}
+
+.admin-category-secondary {
+  color: var(--fstore-black);
+  border-color: #c9c5bf;
+  background: #fff;
+}
+
+.admin-category-secondary:hover {
+  border-color: var(--fstore-black);
+  background: var(--fstore-surface);
+}
+
+.admin-category-table th {
+  color: #68645f;
+  border-bottom-color: var(--fstore-border);
+  background: var(--fstore-surface);
+}
+
+.admin-category-table td {
+  border-bottom-color: #e8e6e2;
+}
+
+.admin-category-table td strong {
+  color: var(--fstore-black);
+}
+
+.admin-category-table td small {
+  color: #77736e;
+}
+
+.admin-category-status.active {
+  color: #245b39;
+  background: #e6f2e9;
+}
+
+.admin-category-status.inactive {
+  color: #625e58;
+  background: #eeece8;
+}
+
+.admin-category-actions button,
+.admin-category-modal header button {
+  color: var(--fstore-black);
+  border-color: var(--fstore-border);
+  background: var(--fstore-surface);
+}
+
+.admin-category-actions button:hover,
+.admin-category-modal header button:hover {
+  border-color: var(--fstore-black);
+  background: #e8e6e2;
+}
+
+.admin-category-feedback {
+  color: #245b39;
+  border-color: #c8dfce;
+  background: #eff7f0;
+}
+
+.admin-category-feedback.is-error,
+.admin-category-load-error {
+  color: #8b2e2e;
+  border-color: #edcaca;
+  background: #fff3f2;
+}
+
+.admin-category-overlay {
+  background: rgba(9, 9, 9, 0.48);
+}
+
+.admin-category-modal > header {
+  border-bottom-color: var(--fstore-border);
+}
+
+.admin-category-modal form > label span {
+  color: #77736e;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .admin-dashboard-card,
+  .admin-dashboard-card-link,
+  .admin-category-primary,
+  .admin-category-actions button {
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+}

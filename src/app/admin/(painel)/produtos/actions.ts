@@ -112,9 +112,21 @@ export async function createProduct(input: unknown): Promise<CreateProductResult
     }).select("id").single();
 
     if (productError || !product) {
-      return { success: false, message: productError?.code === "23505"
-        ? "Já existe um produto com dados semelhantes. Verifique o cadastro."
-        : "Não foi possível criar o produto. Confira os dados e tente novamente." };
+      if (productError?.code === "23505") {
+        return { success: false, message: "Já existe um produto com dados semelhantes. Verifique o cadastro." };
+      }
+      console.error("[FStore createProduct] Falha ao inserir produto:", {
+        code: productError?.code,
+        message: productError?.message,
+        details: productError?.details,
+        hint: productError?.hint,
+      });
+      return {
+        success: false,
+        message: productError
+          ? "Falha ao salvar no banco (" + (productError.code || "sem código") + "): " + productError.message
+          : "O banco não retornou os dados do produto criado.",
+      };
     }
     productId = product.id;
 

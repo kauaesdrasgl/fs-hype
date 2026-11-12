@@ -41,12 +41,12 @@ export default async function AdminDashboardPage() {
             <small>Gerenciar categorias →</small>
           </Link>
 
-          <article className="admin-dashboard-card">
+          <Link href="/admin/produtos" className="admin-dashboard-card admin-dashboard-card-link">
             <span>02</span>
             <h2>Produtos</h2>
-            <p>Cadastro, edição, fotos, cores e tamanhos.</p>
-            <small>Próxima etapa</small>
-          </article>
+            <p>Cadastro, preços, categorias, cores, tamanhos e variações.</p>
+            <small>Gerenciar produtos →</small>
+          </Link>
 
           <article className="admin-dashboard-card">
             <span>03</span>

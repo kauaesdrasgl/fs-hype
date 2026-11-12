@@ -20,6 +20,19 @@ const productSchema = z.object({
   })).min(1).max(20),
 });
 
+const productImagesSchema = z.object({
+  product_id: z.string().uuid(),
+  images: z.array(z.object({
+    color_id: z.string().uuid(),
+    storage_path: z.string().min(1).max(500),
+    alt_text: z.string().trim().max(200),
+    display_order: z.number().int().min(0).max(20),
+  })).min(1).max(100),
+});
+
+type CreateProductResult =
+  | { success: true; message: string; productId: string; colors: { id: string; name: string }[] }
+  | { success: false; message: string };
 type ActionResult = { success: boolean; message: string };
 
 async function getAdminClient() {
@@ -53,7 +66,7 @@ async function uniqueProductSlug(supabase: NonNullable<Awaited<ReturnType<typeof
   throw new Error("Não foi possível gerar um endereço exclusivo para o produto.");
 }
 
-export async function createProduct(input: unknown): Promise<ActionResult> {
+export async function createProduct(input: unknown): Promise<CreateProductResult> {
   const parsed = productSchema.safeParse(input);
   if (!parsed.success) {
     return { success: false, message: parsed.error.issues[0]?.message ?? "Confira os dados do produto." };
@@ -77,6 +90,7 @@ export async function createProduct(input: unknown): Promise<ActionResult> {
   if (!supabase) return { success: false, message: permissionError ?? "Acesso negado." };
 
   let productId: string | null = null;
+  const savedColors: { id: string; name: string }[] = [];
   try {
     if (data.category_id) {
       const { data: category, error } = await supabase.from("categories")
@@ -115,6 +129,7 @@ export async function createProduct(input: unknown): Promise<ActionResult> {
       }).select("id").single();
 
       if (colorError || !savedColor) throw new Error("O produto foi criado, mas não foi possível salvar suas cores.");
+      savedColors.push({ id: savedColor.id, name: color.name });
 
       const variants = color.sizes.map((size) => ({
         product_id: product.id,
@@ -133,11 +148,65 @@ export async function createProduct(input: unknown): Promise<ActionResult> {
 
     revalidatePath("/admin/produtos");
     revalidatePath("/admin");
-    return { success: true, message: "Produto cadastrado com sucesso. O estoque inicial permanece zerado até o lançamento de uma movimentação." };
+    return {
+      success: true,
+      productId: product.id,
+      colors: savedColors,
+      message: "Produto cadastrado com sucesso. O estoque inicial permanece zerado até o lançamento de uma movimentação.",
+    };
   } catch (error) {
     if (productId) {
       await supabase.from("products").delete().eq("id", productId);
     }
     return { success: false, message: error instanceof Error ? error.message : "Ocorreu um erro ao cadastrar o produto." };
   }
+}
+
+export async function attachProductImages(input: unknown): Promise<ActionResult> {
+  const parsed = productImagesSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, message: "Os dados das imagens são inválidos." };
+  }
+
+  const { supabase, error: permissionError } = await getAdminClient();
+  if (!supabase) return { success: false, message: permissionError ?? "Acesso negado." };
+
+  const { product_id: productId, images } = parsed.data;
+  const colorIds = [...new Set(images.map((image) => image.color_id))];
+
+  const { data: colors, error: colorsError } = await supabase
+    .from("product_colors")
+    .select("id")
+    .eq("product_id", productId)
+    .in("id", colorIds);
+
+  if (colorsError || !colors || colors.length !== colorIds.length) {
+    return { success: false, message: "Uma ou mais cores não pertencem a este produto." };
+  }
+
+  const invalidPath = images.some((image) =>
+    !image.storage_path.startsWith(`products/${productId}/${image.color_id}/`) ||
+    image.storage_path.includes("..")
+  );
+  if (invalidPath) {
+    return { success: false, message: "O caminho de armazenamento de uma imagem é inválido." };
+  }
+
+  const rows = images.map((image) => ({
+    product_id: productId,
+    color_id: image.color_id,
+    storage_path: image.storage_path,
+    alt_text: image.alt_text,
+    display_order: image.display_order,
+    is_primary: image.display_order === 0,
+  }));
+
+  const { error: insertError } = await supabase.from("product_images").insert(rows);
+  if (insertError) {
+    return { success: false, message: "As imagens foram enviadas, mas não foi possível vinculá-las ao produto. Tente novamente." };
+  }
+
+  revalidatePath("/admin/produtos");
+  revalidatePath("/admin");
+  return { success: true, message: "Imagens vinculadas ao produto com sucesso." };
 }

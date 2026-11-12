@@ -29,38 +29,41 @@ export default async function AdminDashboardPage() {
       </header>
 
       <section className="admin-dashboard-content">
-        <p className="admin-dashboard-eyebrow">
-          CENTRAL DE GESTÃO
-        </p>
+        <p className="admin-dashboard-eyebrow">CENTRAL DE GESTÃO</p>
         <h1>Painel administrativo</h1>
-        <p className="admin-dashboard-welcome">
-          Bem-vindo, {displayName}.
-        </p>
+        <p className="admin-dashboard-welcome">Bem-vindo, {displayName}.</p>
 
         <div className="admin-dashboard-grid">
-          <article className="admin-dashboard-card">
+          <Link href="/admin/categorias" className="admin-dashboard-card admin-dashboard-card-link">
             <span>01</span>
+            <h2>Categorias</h2>
+            <p>Criação, organização, edição e ativação das categorias da loja.</p>
+            <small>Gerenciar categorias →</small>
+          </Link>
+
+          <article className="admin-dashboard-card">
+            <span>02</span>
             <h2>Produtos</h2>
             <p>Cadastro, edição, fotos, cores e tamanhos.</p>
             <small>Próxima etapa</small>
           </article>
 
           <article className="admin-dashboard-card">
-            <span>02</span>
+            <span>03</span>
             <h2>Estoque</h2>
             <p>Controle unificado de produtos e variantes.</p>
             <small>Em planejamento</small>
           </article>
 
           <article className="admin-dashboard-card">
-            <span>03</span>
+            <span>04</span>
             <h2>Pedidos</h2>
             <p>Acompanhamento de vendas e cancelamentos.</p>
             <small>Em planejamento</small>
           </article>
 
           <article className="admin-dashboard-card">
-            <span>04</span>
+            <span>05</span>
             <h2>Ponto de venda</h2>
             <p>Registro de vendas realizadas na loja física.</p>
             <small>Em planejamento</small>
